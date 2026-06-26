@@ -9,8 +9,8 @@ InsightFlow AI is an enterprise-grade, AI-powered Customer Analytics, Customer I
 ```mermaid
 graph TD
     Client[Next.js 15 Frontend] -->|REST APIs| Server[FastAPI Backend]
-    Server -->|Read/Write Metadata| Postgres[(PostgreSQL + pgvector)]
-    Server -->|Cache & Rate Limit| Redis[(Redis Cache)]
+    Server -->|Read/Write Metadata| Postgres[("PostgreSQL + pgvector")]
+    Server -->|Cache & Rate Limit| Redis[("Redis Cache")]
     Server -->|Generate Insights/QA| OpenAI[OpenAI API]
     Server -->|Machine Learning| Scikit[Scikit-Learn / XGBoost]
 ```
