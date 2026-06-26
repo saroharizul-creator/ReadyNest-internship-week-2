@@ -1,0 +1,51 @@
+services:
+  # 1. FastAPI Backend Service (Docker)
+  - type: web
+    name: insightflow-backend
+    env: docker
+    dockerfile: backend/Dockerfile
+    dockerContext: backend
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: insightflow-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: insightflow-redis
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false # You will enter your OpenAI API key in the Render dashboard
+
+  # 2. Next.js Frontend Service (Node)
+  - type: web
+    name: insightflow-frontend
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    rootDir: frontend
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: insightflow-backend
+          property: host
+
+databases:
+  # 3. PostgreSQL Database
+  - name: insightflow-db
+    databaseName: insightflow
+    user: postgres
+    plan: free
+
+# 4. Redis Cache/Queue
+interfaces:
+  - type: redis
+    name: insightflow-redis
+    plan: free
+    ipAllowList: [] # Private network access only (secure)
