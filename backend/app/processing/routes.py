@@ -71,24 +71,8 @@ async def upload_project_dataset(
     # 3. Clean dataset
     cleaned_df, clean_report = DataProcessingEngine.clean_dataset(mapped_df)
 
-    # Save cleaned file back to disk
-    cleaned_filename = f"cleaned_{filename}"
-    cleaned_storage_path = os.path.join(STORAGE_DIR, f"{project_id}_cleaned_{datetime.now().timestamp()}_{cleaned_filename}")
-    cleaned_df.to_csv(cleaned_storage_path, index=False)
-
     # Update or Create Dataset entry and transactions atomically
     try:
-        # Wrap everything in a single transaction for maximum speed and safety
-        dataset_entry = Dataset(
-            project_id=project_id,
-            filename=filename,
-            file_path=cleaned_storage_path,
-            quality_score=quality_score,
-            validation_report=val_report,
-            cleaning_report=clean_report
-        )
-        db.add(dataset_entry)
-
         # Check if sales_amount is present but profit is missing, and synthesize a default profit margin
         if "sales_amount" in cleaned_df.columns:
             cleaned_df["sales_amount"] = pd.to_numeric(cleaned_df["sales_amount"], errors='coerce').fillna(0.0)
@@ -100,6 +84,22 @@ async def upload_project_dataset(
                 cleaned_df["profit"] = cleaned_df["profit"].clip(lower=0.0)
                 if "profit" not in val_report.get("mapped_columns", []):
                     val_report.setdefault("mapped_columns", []).append("profit")
+
+        # Save cleaned file back to disk
+        cleaned_filename = f"cleaned_{filename}"
+        cleaned_storage_path = os.path.join(STORAGE_DIR, f"{project_id}_cleaned_{datetime.now().timestamp()}_{cleaned_filename}")
+        cleaned_df.to_csv(cleaned_storage_path, index=False)
+
+        # Wrap everything in a single transaction for maximum speed and safety
+        dataset_entry = Dataset(
+            project_id=project_id,
+            filename=filename,
+            file_path=cleaned_storage_path,
+            quality_score=quality_score,
+            validation_report=val_report,
+            cleaning_report=clean_report
+        )
+        db.add(dataset_entry)
 
         mapped_cols = [col for col in DataProcessingEngine.REQUIRED_COLUMNS if col in cleaned_df.columns]
         if len(mapped_cols) >= 5:

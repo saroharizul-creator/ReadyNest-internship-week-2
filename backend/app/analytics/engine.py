@@ -17,6 +17,19 @@ class AnalyticsEngine:
                 "customers": [], "products": [], "rfm": []
             }
 
+        df = df.copy()
+        # Ensure all expected columns are present with fallback defaults
+        defaults = {
+            "customer_id": "", "customer_name": "Unknown", "region": "Default",
+            "product_category": "Other", "product_name": "Other", "order_id": "",
+            "order_date": pd.NaT, "quantity": 0, "sales_amount": 0.0,
+            "profit": 0.0, "discount": 0.0, "customer_type": "Retail",
+            "order_status": "Completed"
+        }
+        for col, default_val in defaults.items():
+            if col not in df.columns:
+                df[col] = default_val
+
         df["sales_amount"] = pd.to_numeric(df["sales_amount"], errors='coerce').fillna(0.0)
         df["profit"] = pd.to_numeric(df["profit"], errors='coerce').fillna(0.0)
         df["quantity"] = pd.to_numeric(df["quantity"], errors='coerce').fillna(0).astype(int)
