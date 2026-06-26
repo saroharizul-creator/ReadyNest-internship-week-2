@@ -1,4 +1,8 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://readynest-internship-week-2.onrender.com/api";
+let baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://readynest-internship-week-2.onrender.com/api";
+if (baseUrl && !baseUrl.endsWith("/api")) {
+  baseUrl = `${baseUrl}/api`;
+}
+const API_BASE_URL = baseUrl;
 
 // Helper: Get JWT from localStorage
 const getAuthHeaders = (): Record<string, string> => {
