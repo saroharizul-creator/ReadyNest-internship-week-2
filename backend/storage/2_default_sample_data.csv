@@ -1,0 +1,20 @@
+Customer ID,Customer Name,Region,Product Category,Product Name,Order ID,Order Date,Quantity,Sales Amount,Profit,Discount,Customer Type,Order Status
+CUST-1035,Alice Miller,South,Furniture,Office Desk,ORD-5055,2026-01-01,3,537.3,200.79,0.1,Corporate,Completed
+CUST-1034,David Martinez,East,Furniture,Bookshelf,ORD-5107,2026-01-01,3,424.65,184.75,0.05,Wholesale,Completed
+CUST-1018,Ivy Moore,North,Apparel,Backpack,ORD-5021,2026-01-02,10,790.0,307.84,0.0,Retail,Completed
+CUST-1007,Charlie Jackson,Central,Furniture,Sofa,ORD-5140,2026-01-02,3,2277.15,780.9,0.05,Corporate,Completed
+CUST-1028,Jane Williams,South,Furniture,Bookshelf,ORD-5006,2026-01-05,6,894.0,444.6,0.0,Wholesale,Pending
+CUST-1018,Ivy Moore,North,Apparel,Athletic Socks,ORD-5052,2026-01-05,5,48.0,10.11,0.2,Retail,Returned
+CUST-1029,Henry Martinez,North,Furniture,Sofa,ORD-5111,2026-01-05,7,5313.35,2518.89,0.05,Retail,Completed
+CUST-1023,Mia Taylor,South,Electronics,Wireless Headphones,ORD-5095,2026-01-08,6,849.3,340.08,0.05,Retail,Pending
+CUST-1010,Eva Davis,South,Office Supplies,Binder Notebook,ORD-5036,2026-01-09,5,42.75,22.33,0.05,Retail,Completed
+CUST-1015,Eva Smith,South,Apparel,Backpack,ORD-5130,2026-01-11,1,67.15,19.93,0.15,Retail,Completed
+CUST-1022,Grace Rodriguez,East,Electronics,Smartphone,ORD-5048,2026-01-12,1,699.0,340.71,0.0,Retail,Completed
+CUST-1023,Mia Taylor,South,Electronics,Smartphone,ORD-5142,2026-01-12,4,2376.6,901.01,0.15,Retail,Pending
+CUST-1005,David Williams,East,Office Supplies,Desk Organizer,ORD-5060,2026-01-13,8,190.0,73.08,0.05,Retail,Completed
+CUST-1028,Jane Williams,South,Apparel,Smart Jacket,ORD-5075,2026-01-13,9,1615.95,627.16,0.05,Wholesale,Returned
+CUST-1019,David Martinez,West,Office Supplies,Binder Notebook,ORD-5120,2026-01-13,7,56.7,23.26,0.1,Retail,Completed
+CUST-1015,Eva Smith,South,Office Supplies,Whiteboard,ORD-5078,2026-01-14,5,220.5,89.62,0.1,Retail,Completed
+CUST-1027,Peter Brown,South,Office Supplies,Gel Pens Pack,ORD-5016,2026-01-16,8,102.0,42.11,0.15,Corporate,Completed
+CUST-1022,Grace Rodriguez,East,Apparel,Smart Jacket,ORD-5017,2026-01-19,5,850.5,334.3,0.1,Retail,Pending
+CUST-1014,Noah Hernandez,East,Furniture,Office Desk,ORD-5141,2026-01-19,3,567.15,227.14,0.05,Corporate,Completed
