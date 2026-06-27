@@ -1,5 +1,6 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+import re
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from app.database.connection import engine, Base
 from app.auth.routes import router as auth_router
 from app.projects.routes import router as projects_router
@@ -22,14 +23,47 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Enable CORS dynamically for development (localhost) and production/preview environments on Vercel and Render
-app.add_middleware(
-    CORSMiddleware,
-    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?|https://.*\.vercel\.app|https://.*\.onrender\.com",
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+# Compile regex pattern to match development (localhost) and production/preview environments on Vercel and Render
+ALLOWED_ORIGIN_REGEX = re.compile(
+    r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$|"
+    r"^https://.*\.vercel\.app$|"
+    r"^https://.*\.onrender\.com$"
 )
+
+def is_allowed_origin(origin: str) -> bool:
+    return bool(ALLOWED_ORIGIN_REGEX.match(origin))
+
+@app.middleware("http")
+async def custom_cors_middleware(request: Request, call_next):
+    # Handle preflight OPTIONS requests manually
+    if request.method == "OPTIONS":
+        response = JSONResponse(content="OK", status_code=200)
+        origin = request.headers.get("origin")
+        if origin and is_allowed_origin(origin):
+            response.headers["Access-Control-Allow-Origin"] = origin
+            response.headers["Access-Control-Allow-Credentials"] = "true"
+            response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+            response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+        return response
+
+    try:
+        response = await call_next(request)
+    except Exception as e:
+        # Wrap unhandled exceptions in a standard JSON response with CORS headers
+        # to prevent browsers from obscuring backend crashes as CORS blocked failures.
+        response = JSONResponse(
+            content={"detail": f"Internal Server Error: {str(e)}"},
+            status_code=500
+        )
+        
+    origin = request.headers.get("origin")
+    if origin and is_allowed_origin(origin):
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+        
+    return response
 
 # Mount API Routers
 app.include_router(auth_router, prefix="/api")
