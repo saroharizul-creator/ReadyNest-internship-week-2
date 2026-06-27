@@ -11,8 +11,8 @@ if db_url.startswith("postgresql"):
         # Create a temporary engine and test connection with a short timeout
         test_engine = create_engine(
             db_url,
-            pool_size=3,
-            max_overflow=0,
+            pool_size=20,
+            max_overflow=10,
             pool_recycle=1800,
             pool_pre_ping=True,
             connect_args={"connect_timeout": 3}
@@ -25,13 +25,11 @@ if db_url.startswith("postgresql"):
         print(f"PostgreSQL connection failed: {e}. Falling back to SQLite ('sqlite:///data.db').")
         db_url = "sqlite:///data.db"
 
-from sqlalchemy.pool import NullPool
-
 if engine is None:
+    # Use standard connection pooling (QueuePool) for SQLite to leverage WAL mode concurrency
     engine = create_engine(
         db_url,
-        connect_args={"check_same_thread": False, "timeout": 30} if "sqlite" in db_url else {},
-        poolclass=NullPool if "sqlite" in db_url else None
+        connect_args={"check_same_thread": False, "timeout": 30} if "sqlite" in db_url else {}
     )
 
 @event.listens_for(engine, "connect")

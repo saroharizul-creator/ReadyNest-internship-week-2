@@ -33,7 +33,11 @@ export default function CustomerOverview({ customerData, isLoading }: CustomerOv
     );
   }
 
-  const { kpis = {}, growth_trend = [], new_vs_returning = {}, acquisition_timeline = [], retention_trend = [], cohort_matrix = [], insights = { acquisition_analysis: [], retention_analysis: [], growth_recommendations: [] } } = customerData;
+  const { kpis = {}, growth_trend = [], new_vs_returning = {}, acquisition_timeline = [], retention_trend = [], cohort_matrix = [], insights = {} } = customerData;
+
+  const acquisitionAnalysis = insights?.acquisition_analysis || [];
+  const retentionAnalysis = insights?.retention_analysis || [];
+  const growthRecommendations = insights?.growth_recommendations || [];
 
   const pieData = [
     { name: "New Buyers", value: new_vs_returning.new || 0 },
@@ -124,7 +128,7 @@ export default function CustomerOverview({ customerData, isLoading }: CustomerOv
             <Users className="w-4 h-4 text-teal-400" /> Acquisition Analysis
           </h4>
           <div className="space-y-2.5">
-            {insights.acquisition_analysis.map((ins: string, idx: number) => (
+            {acquisitionAnalysis.map((ins: string, idx: number) => (
               <div key={idx} className="flex gap-2 items-start text-xs text-slate-350 leading-relaxed">
                 <span className="text-teal-400 font-bold">&bull;</span>
                 <p>{ins}</p>
@@ -139,7 +143,7 @@ export default function CustomerOverview({ customerData, isLoading }: CustomerOv
             <RefreshCw className="w-4 h-4 text-indigo-400" /> Retention Analysis
           </h4>
           <div className="space-y-2.5">
-            {insights.retention_analysis.map((ins: string, idx: number) => (
+            {retentionAnalysis.map((ins: string, idx: number) => (
               <div key={idx} className="flex gap-2 items-start text-xs text-slate-350 leading-relaxed">
                 <span className="text-indigo-400 font-bold">&bull;</span>
                 <p>{ins}</p>
@@ -154,7 +158,7 @@ export default function CustomerOverview({ customerData, isLoading }: CustomerOv
             <Lightbulb className="w-4 h-4 text-amber-400" /> Growth Recommendations
           </h4>
           <div className="space-y-2.5">
-            {insights.growth_recommendations.map((ins: string, idx: number) => (
+            {growthRecommendations.map((ins: string, idx: number) => (
               <div key={idx} className="flex gap-2 items-start text-xs text-slate-350 leading-relaxed">
                 <span className="text-amber-400 font-bold">&bull;</span>
                 <p>{ins}</p>

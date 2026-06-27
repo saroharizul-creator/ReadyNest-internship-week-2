@@ -11,7 +11,22 @@ class ExecutiveSummaryEngine:
         to generate detailed insights, recommendations, opportunities, risks, and strategies.
         """
         if df.empty:
-            return {}
+            return {
+                "kpis": {
+                    "total_customers": 0,
+                    "total_revenue": 0.0,
+                    "total_orders": 0,
+                    "aov": 0.0,
+                    "profit_margin": 0.0,
+                    "retention_rate": 0.0
+                },
+                "insights": [],
+                "recommendations": [],
+                "risks": [],
+                "opportunities": [],
+                "revenue_suggestions": [],
+                "retention_suggestions": []
+            }
 
         df = df.copy()
         # Ensure all expected columns are present with fallback defaults

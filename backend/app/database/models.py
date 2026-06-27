@@ -25,7 +25,7 @@ class Project(Base):
     industry = Column(String(50), nullable=True)  # e.g. Retail, SaaS, Health
     dataset_type = Column(String(50), nullable=True)  # e.g. Customer + Sales
     created_at = Column(DateTime, default=datetime.utcnow)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
 
     owner = relationship("User", back_populates="projects")
     datasets = relationship("Dataset", back_populates="project", cascade="all, delete-orphan")
@@ -35,7 +35,7 @@ class Dataset(Base):
     __tablename__ = "datasets"
 
     id = Column(Integer, primary_key=True, index=True)
-    project_id = Column(Integer, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    project_id = Column(Integer, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
     filename = Column(String(200), nullable=False)
     file_path = Column(String(500), nullable=False)  # Path to saved file on disk/S3
     quality_score = Column(Float, nullable=True)

@@ -22,10 +22,10 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Enable CORS for Next.js frontend port 3000
+# Enable CORS dynamically for development (localhost) and production/preview environments on Vercel and Render
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?|https://.*\.vercel\.app|https://.*\.onrender\.com",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -109,20 +109,22 @@ export const api = {
   },
 
   // Get dynamic filters
-  async getFilterOptions(projectId: number) {
+  async getFilterOptions(projectId: number, signal?: AbortSignal) {
     const res = await fetch(`${API_BASE_URL}/projects/${projectId}/filter-options`, {
       headers: { ...getAuthHeaders() },
+      signal,
     });
     if (!res.ok) throw new Error("Failed to fetch filter options");
     return res.json();
   },
 
   // Get Analytics Dashboard data
-  async getAnalytics(projectId: number, filters: any = {}) {
+  async getAnalytics(projectId: number, filters: any = {}, signal?: AbortSignal) {
     const res = await fetch(`${API_BASE_URL}/projects/${projectId}/analytics`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify(filters),
+      signal,
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.detail || "Failed to fetch analytics");
@@ -130,66 +132,72 @@ export const api = {
   },
 
   // Expanded Modules Endpoints
-  async getEDA(projectId: number, filters: any = {}) {
+  async getEDA(projectId: number, filters: any = {}, signal?: AbortSignal) {
     const res = await fetch(`${API_BASE_URL}/projects/${projectId}/eda`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify(filters),
+      signal,
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.detail || "Failed to fetch EDA metrics");
     return json;
   },
 
-  async getProductAnalytics(projectId: number, filters: any = {}) {
+  async getProductAnalytics(projectId: number, filters: any = {}, signal?: AbortSignal) {
     const res = await fetch(`${API_BASE_URL}/projects/${projectId}/products-analytics`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify(filters),
+      signal,
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.detail || "Failed to fetch product analytics");
     return json;
   },
 
-  async getCustomerAnalytics(projectId: number, filters: any = {}) {
+  async getCustomerAnalytics(projectId: number, filters: any = {}, signal?: AbortSignal) {
     const res = await fetch(`${API_BASE_URL}/projects/${projectId}/customers-analytics`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify(filters),
+      signal,
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.detail || "Failed to fetch customer analytics");
     return json;
   },
 
-  async getRegionalAnalytics(projectId: number, filters: any = {}) {
+  async getRegionalAnalytics(projectId: number, filters: any = {}, signal?: AbortSignal) {
     const res = await fetch(`${API_BASE_URL}/projects/${projectId}/regional-analytics`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify(filters),
+      signal,
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.detail || "Failed to fetch regional analytics");
     return json;
   },
 
-  async getBusinessQuestions(projectId: number, filters: any = {}) {
+  async getBusinessQuestions(projectId: number, filters: any = {}, signal?: AbortSignal) {
     const res = await fetch(`${API_BASE_URL}/projects/${projectId}/business-questions`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify(filters),
+      signal,
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.detail || "Failed to fetch question-center answers");
     return json;
   },
 
-  async getExecutiveSummary(projectId: number, filters: any = {}) {
+  async getExecutiveSummary(projectId: number, filters: any = {}, signal?: AbortSignal) {
     const res = await fetch(`${API_BASE_URL}/projects/${projectId}/executive-summary`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify(filters),
+      signal,
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.detail || "Failed to fetch executive summary");
@@ -197,35 +205,39 @@ export const api = {
   },
 
   // ML Predictions
-  async getMLSegmentation(projectId: number) {
+  async getMLSegmentation(projectId: number, signal?: AbortSignal) {
     const res = await fetch(`${API_BASE_URL}/projects/${projectId}/ml/segmentation`, {
       headers: { ...getAuthHeaders() },
+      signal,
     });
     if (!res.ok) throw new Error("Failed to fetch segmentation clustering");
     return res.json();
   },
 
-  async getMLChurn(projectId: number) {
+  async getMLChurn(projectId: number, signal?: AbortSignal) {
     const res = await fetch(`${API_BASE_URL}/projects/${projectId}/ml/churn`, {
       headers: { ...getAuthHeaders() },
+      signal,
     });
     if (!res.ok) throw new Error("Failed to fetch churn predictions");
     return res.json();
   },
 
-  async getMLRecommendations(projectId: number) {
+  async getMLRecommendations(projectId: number, signal?: AbortSignal) {
     const res = await fetch(`${API_BASE_URL}/projects/${projectId}/ml/recommendations`, {
       headers: { ...getAuthHeaders() },
+      signal,
     });
     if (!res.ok) throw new Error("Failed to fetch ML recommendations");
     return res.json();
   },
 
   // AI Chat and Insights
-  async getAIInsights(projectId: number) {
+  async getAIInsights(projectId: number, signal?: AbortSignal) {
     const res = await fetch(`${API_BASE_URL}/projects/${projectId}/ai/insights`, {
       method: "POST",
       headers: { ...getAuthHeaders() },
+      signal,
     });
     if (!res.ok) throw new Error("Failed to fetch AI insights");
     return res.json();

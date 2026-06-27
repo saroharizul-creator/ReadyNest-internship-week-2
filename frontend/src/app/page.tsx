@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuthStore, useProjectStore } from "../store";
 import { api } from "../services/api";
 import {
@@ -40,6 +40,7 @@ import AIAnalyst from "../components/dashboard/AIAnalyst";
 
 export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -210,6 +211,16 @@ export default function DashboardPage() {
   // 3. Tab Specific Data Loading
   const loadTabMetrics = async () => {
     if (!activeProject) return;
+
+    // Abort any active request in this workspace before initiating new ones
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const signal = controller.signal;
+
     const filters = {
       regions: selectedRegions,
       types: selectedTypes,
@@ -225,13 +236,15 @@ export default function DashboardPage() {
         setIsLoadingAnalytics(true);
         try {
           const [execSummary, analyticResult] = await Promise.all([
-            api.getExecutiveSummary(activeProject.id, filters),
-            api.getAnalytics(activeProject.id, filters),
+            api.getExecutiveSummary(activeProject.id, filters, signal),
+            api.getAnalytics(activeProject.id, filters, signal),
           ]);
           setExecData(execSummary);
           setAnalyticsData(analyticResult);
-        } catch (err) {
-          showToast("Failed to load executive summary analytics", "error");
+        } catch (err: any) {
+          if (err.name !== "AbortError") {
+            showToast("Failed to load executive summary analytics", "error");
+          }
         } finally {
           setIsLoadingExec(false);
           setIsLoadingAnalytics(false);
@@ -241,10 +254,12 @@ export default function DashboardPage() {
       case "eda":
         setIsLoadingEDA(true);
         try {
-          const res = await api.getEDA(activeProject.id, filters);
+          const res = await api.getEDA(activeProject.id, filters, signal);
           setEdaData(res);
-        } catch (err) {
-          showToast("Failed to run EDA metrics", "error");
+        } catch (err: any) {
+          if (err.name !== "AbortError") {
+            showToast("Failed to run EDA metrics", "error");
+          }
         } finally {
           setIsLoadingEDA(false);
         }
@@ -253,10 +268,12 @@ export default function DashboardPage() {
       case "product":
         setIsLoadingProduct(true);
         try {
-          const res = await api.getProductAnalytics(activeProject.id, filters);
+          const res = await api.getProductAnalytics(activeProject.id, filters, signal);
           setProductData(res);
-        } catch (err) {
-          showToast("Failed to compute product rankings", "error");
+        } catch (err: any) {
+          if (err.name !== "AbortError") {
+            showToast("Failed to compute product rankings", "error");
+          }
         } finally {
           setIsLoadingProduct(false);
         }
@@ -265,10 +282,12 @@ export default function DashboardPage() {
       case "customer":
         setIsLoadingCustomer(true);
         try {
-          const res = await api.getCustomerAnalytics(activeProject.id, filters);
+          const res = await api.getCustomerAnalytics(activeProject.id, filters, signal);
           setCustomerData(res);
-        } catch (err) {
-          showToast("Failed to run customer analytics", "error");
+        } catch (err: any) {
+          if (err.name !== "AbortError") {
+            showToast("Failed to run customer analytics", "error");
+          }
         } finally {
           setIsLoadingCustomer(false);
         }
@@ -277,10 +296,12 @@ export default function DashboardPage() {
       case "regional":
         setIsLoadingRegional(true);
         try {
-          const res = await api.getRegionalAnalytics(activeProject.id, filters);
+          const res = await api.getRegionalAnalytics(activeProject.id, filters, signal);
           setRegionalData(res);
-        } catch (err) {
-          showToast("Failed to load regional analytics", "error");
+        } catch (err: any) {
+          if (err.name !== "AbortError") {
+            showToast("Failed to load regional analytics", "error");
+          }
         } finally {
           setIsLoadingRegional(false);
         }
@@ -289,10 +310,12 @@ export default function DashboardPage() {
       case "questions":
         setIsLoadingQuestions(true);
         try {
-          const res = await api.getBusinessQuestions(activeProject.id, filters);
+          const res = await api.getBusinessQuestions(activeProject.id, filters, signal);
           setQuestionsData(res);
-        } catch (err) {
-          showToast("Failed to solve business questions", "error");
+        } catch (err: any) {
+          if (err.name !== "AbortError") {
+            showToast("Failed to solve business questions", "error");
+          }
         } finally {
           setIsLoadingQuestions(false);
         }
@@ -302,15 +325,17 @@ export default function DashboardPage() {
         setIsLoadingML(true);
         try {
           const [segments, churns, recommends] = await Promise.all([
-            api.getMLSegmentation(activeProject.id),
-            api.getMLChurn(activeProject.id),
-            api.getMLRecommendations(activeProject.id),
+            api.getMLSegmentation(activeProject.id, signal),
+            api.getMLChurn(activeProject.id, signal),
+            api.getMLRecommendations(activeProject.id, signal),
           ]);
           setMlSegmentation(segments);
           setMlChurn(churns);
           setMlRecommendations(recommends);
-        } catch (err) {
-          showToast("Failed to load ML models", "error");
+        } catch (err: any) {
+          if (err.name !== "AbortError") {
+            showToast("Failed to load ML models", "error");
+          }
         } finally {
           setIsLoadingML(false);
         }
@@ -319,10 +344,12 @@ export default function DashboardPage() {
       case "ai":
         setIsLoadingExec(true); // AI analyst relies on executive insights engine
         try {
-          const execSummary = await api.getExecutiveSummary(activeProject.id, filters);
+          const execSummary = await api.getExecutiveSummary(activeProject.id, filters, signal);
           setExecData(execSummary);
-        } catch (err) {
-          showToast("Failed to load AI executive insights", "error");
+        } catch (err: any) {
+          if (err.name !== "AbortError") {
+            showToast("Failed to load AI executive insights", "error");
+          }
         } finally {
           setIsLoadingExec(false);
         }
@@ -411,7 +438,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (activeProject) {
       fetchFiltersInfo();
-      loadTabMetrics();
+      // loadTabMetrics is omitted here; the activeTab/activeProject effect handles it cleanly.
     }
   }, [activeProject]);
 
@@ -420,6 +447,15 @@ export default function DashboardPage() {
       loadTabMetrics();
     }
   }, [activeTab, activeProject]);
+
+  // Clean up abort controller on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
   // Hydration Guard
   if (!mounted) {

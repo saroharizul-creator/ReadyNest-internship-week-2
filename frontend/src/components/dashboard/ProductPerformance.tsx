@@ -33,7 +33,11 @@ export default function ProductPerformance({ productData, isLoading }: ProductPe
     );
   }
 
-  const { top_selling = [], least_selling = [], category_analysis = [], product_trends = [], insights = { best_performing: [], underperforming: [], recommendations: [] } } = productData;
+  const { top_selling = [], least_selling = [], category_analysis = [], product_trends = [], insights = {} } = productData;
+
+  const bestPerforming = insights?.best_performing || [];
+  const underperforming = insights?.underperforming || [];
+  const recommendations = insights?.recommendations || [];
 
   // Formatting for Recharts line chart data
   // Product trends is a list of {month, Product1_name: revenue, Product2_name: revenue...}
@@ -50,7 +54,7 @@ export default function ProductPerformance({ productData, isLoading }: ProductPe
             <CheckCircle className="w-4 h-4 text-teal-400" /> Catalog Highlights
           </h4>
           <div className="space-y-2.5">
-            {insights.best_performing.map((ins: string, idx: number) => (
+            {bestPerforming.map((ins: string, idx: number) => (
               <div key={idx} className="flex gap-2 items-start text-xs text-slate-350 leading-relaxed">
                 <span className="text-teal-400 font-bold">&bull;</span>
                 <p>{ins}</p>
@@ -65,7 +69,7 @@ export default function ProductPerformance({ productData, isLoading }: ProductPe
             <AlertTriangle className="w-4 h-4 text-red-400" /> Margin Leak Risks
           </h4>
           <div className="space-y-2.5">
-            {insights.underperforming.map((ins: string, idx: number) => (
+            {underperforming.map((ins: string, idx: number) => (
               <div key={idx} className="flex gap-2 items-start text-xs text-slate-350 leading-relaxed">
                 <span className="text-red-400 font-bold">&bull;</span>
                 <p>{ins}</p>
@@ -80,8 +84,8 @@ export default function ProductPerformance({ productData, isLoading }: ProductPe
             <Lightbulb className="w-4 h-4 text-amber-400" /> Product Recommendations
           </h4>
           <div className="space-y-2.5">
-            {insights.recommendations.map((ins: string, idx: number) => (
-              <div key={idx} className="flex gap-2 items-start text-xs text-slate-350 leading-relaxed">
+            {recommendations.map((ins: string, idx: number) => (
+              <div key={idx} className="flex gap-2 items-start text-xs text-slate-355 leading-relaxed">
                 <span className="text-amber-400 font-bold">&bull;</span>
                 <p>{ins}</p>
               </div>

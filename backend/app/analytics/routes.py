@@ -74,6 +74,29 @@ class DataFrameCache:
             if project_id in self._cache:
                 del self._cache[project_id]
 
+    def _standardize_df(self, df: pd.DataFrame) -> pd.DataFrame:
+        if df.empty:
+            return df
+        # Fill missing columns with defaults
+        defaults = {
+            "customer_id": "", "customer_name": "Unknown", "region": "Default",
+            "product_category": "Other", "product_name": "Other", "order_id": "",
+            "order_date": pd.NaT, "quantity": 0, "sales_amount": 0.0,
+            "profit": 0.0, "discount": 0.0, "customer_type": "Retail",
+            "order_status": "Completed"
+        }
+        for col, default_val in defaults.items():
+            if col not in df.columns:
+                df[col] = default_val
+
+        # Standardize column data types once at load time
+        df["sales_amount"] = pd.to_numeric(df["sales_amount"], errors='coerce').fillna(0.0)
+        df["profit"] = pd.to_numeric(df["profit"], errors='coerce').fillna(0.0)
+        df["quantity"] = pd.to_numeric(df["quantity"], errors='coerce').fillna(0).astype(int)
+        df["discount"] = pd.to_numeric(df["discount"], errors='coerce').fillna(0.0)
+        df["order_date"] = pd.to_datetime(df["order_date"], errors='coerce')
+        return df
+
     def _load_from_db_or_file(self, project_id: int, db: Session) -> pd.DataFrame:
         from sqlalchemy import text
         sql = """
@@ -85,14 +108,14 @@ class DataFrameCache:
         """
         df = pd.read_sql_query(text(sql), con=db.bind, params={"project_id": project_id})
         if not df.empty:
-            return df
+            return self._standardize_df(df)
             
         # Fallback to Dataset cleaned CSV file
         dataset = db.query(Dataset).filter(Dataset.project_id == project_id).order_by(Dataset.created_at.desc()).first()
         if dataset and os.path.exists(dataset.file_path):
             df = pd.read_csv(dataset.file_path)
             df.columns = [col.strip().lower().replace(" ", "_") for col in df.columns]
-            return df
+            return self._standardize_df(df)
             
         return pd.DataFrame()
 
@@ -119,12 +142,8 @@ def apply_filters(df: pd.DataFrame, filters: FilterSchema) -> pd.DataFrame:
     if df.empty:
         return df
         
-    # Standardize data types
-    df["sales_amount"] = pd.to_numeric(df["sales_amount"], errors='coerce').fillna(0.0)
-    df["profit"] = pd.to_numeric(df["profit"], errors='coerce').fillna(0.0)
-    df["quantity"] = pd.to_numeric(df["quantity"], errors='coerce').fillna(0).astype(int)
-    df["discount"] = pd.to_numeric(df["discount"], errors='coerce').fillna(0.0)
-    df["order_date"] = pd.to_datetime(df["order_date"], errors='coerce')
+    # Shallow copy to avoid in-memory reference mutation side-effects between concurrent requests
+    df = df.copy()
     
     # 1. Filter by date range
     if filters.startDate:
